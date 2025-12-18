@@ -8,6 +8,17 @@ require 'db.php';
 // キーワード取得
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 
+// フォームで送信された材料の取得
+$selectedIngredients = $_GET['ingredients'] ?? [];
+
+
+$ingredientsStmt = $pdo->query("SELECT DISTINCT TRIM(ingredient) AS ingredient
+                                FROM recipes, 
+                                     JSON_TABLE(CONCAT('[\"', REPLACE(ingredients, ',', '\",\"'), '\"]'),
+                                                '$[*]' COLUMNS(ingredient VARCHAR(255) PATH '$')) AS temp
+                               ");
+$ingredientsList = $ingredientsStmt->fetchAll(PDO::FETCH_COLUMN);
+
 // ページ設定
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
@@ -24,6 +35,15 @@ if ($q !== '') {
     $params[':kw_desc'] = "%$q%";
     $params[':kw_ing']  = "%$q%";
 }
+
+if (!empty($selectedIngredients)) {
+    foreach ($selectedIngredients as $idx => $ing) {
+        $paramName = ":ing$idx";
+        $where[] = "ingredients LIKE $paramName";
+        $params[$paramName] = "%$ing%";
+    }
+}
+
 
 // 総件数取得
 $countSql = "SELECT COUNT(*) FROM recipes";
@@ -73,11 +93,34 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </nav>
 
 <!-- 検索フォーム -->
-<div id="searchbox" class="card">
-    <form action="list.php" method="get">
-        <input type="text" name="q" id="search-input" value="<?= htmlspecialchars($q) ?>" placeholder="キーワード検索">
-        <button type="submit" class="button-main">検索</button>
-    </form>
+<div id="searchbox">
+    <div class="card">
+        <p>レシピ検索</p>
+        <form action="list.php" method="get">
+            <input type="text" name="q" id="search-input">
+            <button type="submit" class="button-main">検索</button>
+        </form>
+    </div><br>
+
+    <div class="card">
+        <p>材料で絞り込み 
+            <button type="button" id="toggle-ingredients">▼</button>
+        </p>
+        <div id="ingredient-list" style="display: none;">
+            <form action="list.php" method="get">
+                <input type="hidden" name="q" value="<?= htmlspecialchars($q) ?>">
+                <?php foreach ($ingredientsList as $ing): ?>
+                    <label>
+                        <input type="checkbox" name="ingredients[]" value="<?= htmlspecialchars($ing) ?>"
+                            <?= in_array($ing, $selectedIngredients) ? 'checked' : '' ?>>
+                        <?= htmlspecialchars($ing) ?>
+                    </label>
+                <?php endforeach; ?>
+                <br>
+                <button type="submit" class="button-main">絞り込む</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- レシピ一覧 -->
@@ -102,23 +145,24 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php if ($totalPages > 1): ?>
 <div class="pagination">
     <?php if ($page > 1): ?>
-        <a href="?q=<?= urlencode($q) ?>&page=<?= $page - 1 ?>">&laquo; 前へ</a>
+        <a href="?q=<?= urlencode($q) ?>&page=<?= $page - 1 ?><?= !empty($selectedIngredients) ? '&'.http_build_query(['ingredients'=>$selectedIngredients]) : '' ?>">&laquo; 前へ</a>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
         <?php if ($i == $page): ?>
             <strong><?= $i ?></strong>
         <?php else: ?>
-            <a href="?q=<?= urlencode($q) ?>&page=<?= $i ?>"><?= $i ?></a>
+            <a href="?q=<?= urlencode($q) ?>&page=<?= $i ?><?= !empty($selectedIngredients) ? '&'.http_build_query(['ingredients'=>$selectedIngredients]) : '' ?>"><?= $i ?></a>
         <?php endif; ?>
     <?php endfor; ?>
 
     <?php if ($page < $totalPages): ?>
-        <a href="?q=<?= urlencode($q) ?>&page=<?= $page + 1 ?>">次へ &raquo;</a>
+        <a href="?q=<?= urlencode($q) ?>&page=<?= $page + 1 ?><?= !empty($selectedIngredients) ? '&'.http_build_query(['ingredients'=>$selectedIngredients]) : '' ?>">次へ &raquo;</a>
     <?php endif; ?>
 </div>
 <?php endif; ?>
 
 <footer>レシピ検索サイト</footer>
+<script src="js/toggleIngredients.js"></script>
 </body>
 </html>

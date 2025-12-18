@@ -190,6 +190,43 @@ body::after {
   grid-template-columns: 1fr 1fr;
 } 
 
+/* 材料リスト全体 */
+#ingredient-list form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* ラベル間の間隔 */
+}
+
+/* 材料のラベル */
+#ingredient-list label {
+    flex: 0 0 100px; /* 固定幅100pxに統一 */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #f9f9f9;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    text-align: left; /* テキスト左寄せ */
+}
+
+/* ボタンをフォームの下中央に配置 */
+#ingredient-list button {
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px 15px;
+    font-size: 0.95rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+
+
 .pagination {
   grid-row: pagination;
   text-align: center;
