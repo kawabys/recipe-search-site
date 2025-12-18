@@ -21,8 +21,17 @@
 ### 管理画面ログイン
 ![管理画面ログイン](docs/admin_login.png)
 
+### 管理画面トップ
+![管理画面ログイン](docs/admin_top.png)
+
 ### レシピ管理画面
 ![レシピ管理画面](docs/admin_dashboard.png)
+
+### レシピ編集画面
+![レシピ管理画面](docs/admin_edit_recipe.png)
+
+### レシピ追加画面
+![レシピ管理画面](docs/admin_add_recipe.png)
 
 ---
 
