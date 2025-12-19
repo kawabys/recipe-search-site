@@ -93,34 +93,37 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </nav>
 
 <!-- 検索フォーム -->
-<div id="searchbox">
+<form action="list.php" method="get">
+  <div id="searchbox">
+    <!-- 検索 -->
     <div class="card">
-        <p>レシピ検索</p>
-        <form action="list.php" method="get">
-            <input type="text" name="q" id="search-input" value="<?= htmlspecialchars($q) ?>">            <button type="submit" class="button-main">検索</button>
-        </form>
-    </div><br>
-
-    <div class="card">
-        <p>材料で絞り込み 
-            <button type="button" id="toggle-ingredients">▼</button>
-        </p>
-        <div id="ingredient-list" style="display: none;">
-            <form action="list.php" method="get">
-                <input type="hidden" name="q" value="<?= htmlspecialchars($q) ?>">
-                <?php foreach ($ingredientsList as $ing): ?>
-                    <label>
-                        <input type="checkbox" name="ingredients[]" value="<?= htmlspecialchars($ing) ?>"
-                            <?= in_array($ing, $selectedIngredients) ? 'checked' : '' ?>>
-                        <?= htmlspecialchars($ing) ?>
-                    </label>
-                <?php endforeach; ?>
-                <br>
-                <button type="submit" class="button-main">絞り込む</button>
-            </form>
-        </div>
+      <p>レシピ検索</p>
+      <input type="text" name="q" id="search-input" value="<?= htmlspecialchars($q) ?>">
+      <button type="submit" class="button-main">検索</button>
     </div>
-</div>
+    <br>
+    <!-- 材料絞り込み -->
+    <div class="card">
+      <p>
+        材料で絞り込み
+        <button type="button" id="toggle-ingredients">▼</button>
+      </p>
+
+      <div id="ingredient-list" style="display: none;">
+        <?php foreach ($ingredientsList as $ing): ?>
+          <label>
+            <input type="checkbox" name="ingredients[]" value="<?= htmlspecialchars($ing) ?>"
+              <?= in_array($ing, (array)$selectedIngredients, true) ? 'checked' : '' ?>>
+            <?= htmlspecialchars($ing) ?>
+          </label>
+        <?php endforeach; ?>
+        <button type="submit" class="button-main">絞り込む</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
 
 <!-- レシピ一覧 -->
 <div class="recipes card">
