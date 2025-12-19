@@ -97,8 +97,7 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="card">
         <p>レシピ検索</p>
         <form action="list.php" method="get">
-            <input type="text" name="q" id="search-input">
-            <button type="submit" class="button-main">検索</button>
+            <input type="text" name="q" id="search-input" value="<?= htmlspecialchars($q) ?>">            <button type="submit" class="button-main">検索</button>
         </form>
     </div><br>
 
